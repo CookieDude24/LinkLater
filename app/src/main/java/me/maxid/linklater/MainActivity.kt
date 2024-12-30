@@ -2,6 +2,7 @@
 
 package me.maxid.linklater
 
+import android.Manifest
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -14,25 +15,24 @@ import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import me.maxid.linklater.ui.theme.LinkLaterTheme
-import java.time.LocalTime
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
+import java.text.SimpleDateFormat
+import java.util.*
 
 class MainActivity : ComponentActivity() {
 
@@ -48,18 +48,21 @@ class MainActivity : ComponentActivity() {
             LinkLaterTheme {
                 MainActivityScreen(
                     listDataStore = listDataStore,
-                    onAddItem = { newItem ->
+                    onAddItem = { newItem, scheduledTime ->
                         lifecycleScope.launch {
-                            listDataStore.appendToList(newItem)
+                            listDataStore.appendToList(
+                                newItem,
+                                SimpleDateFormat("HH:mm", Locale.getDefault()).format(scheduledTime.time)
+                                    ?: "Unknown time"
+                            )
                         }
-                    },
-                    onScheduleNotification = { delayInSeconds ->
                         NotificationUtils.scheduleNotification(
-                            context = this,
-                            delayInSeconds = delayInSeconds,
-                            title = "Reminder Notification",
-                            message = "Scheduled reminder triggered."
+                            context = this@MainActivity,
+                            delayInSeconds = scheduledTime.timeInMillis / 1000 - System.currentTimeMillis() / 1000,
+                            title = "Reminder",
+                            message = newItem,
                         )
+
                     }
                 )
             }
@@ -70,12 +73,11 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainActivityScreen(
     listDataStore: ListDataStore,
-    onAddItem: (String) -> Unit,
-    onScheduleNotification: (Long) -> Unit
+    onAddItem: (String, Calendar) -> Unit,
 ) {
     // State for managing dialog visibility
     val isDialogOpen = remember { mutableStateOf(false) }
-    val savedList = remember { mutableStateOf<List<String>>(emptyList()) }
+    val savedList = remember { mutableStateOf<List<Pair<String, String>>>(emptyList()) }
 
     // Collecting ListDataStore data
     LaunchedEffect(Unit) {
@@ -97,7 +99,6 @@ fun MainActivityScreen(
         floatingActionButton = {
             CommonFloatingButtons(
                 onAddClick = { isDialogOpen.value = true },
-                onNotifyClick = { onScheduleNotification(10) }
             )
         }
     ) { padding ->
@@ -110,16 +111,20 @@ fun MainActivityScreen(
     // Conditionally show the AddItemDialog
     if (isDialogOpen.value) {
         AddItemDialog(
-            onDismiss = { enteredText ->
+            onDismiss = { enteredText, enteredTime ->
                 if (!enteredText.isNullOrEmpty()) {
-                    onAddItem(enteredText)
+                    if (enteredTime != null) {
+                        onAddItem(enteredText, enteredTime)
+                    }
                 }
                 isDialogOpen.value = false
-            }
+            },
+            modifier = Modifier.padding(4.dp)
         )
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CommonTopBar(title: String) {
     CenterAlignedTopAppBar(
@@ -130,39 +135,48 @@ fun CommonTopBar(title: String) {
 @Composable
 fun CommonFloatingButtons(
     onAddClick: () -> Unit,
-    onNotifyClick: () -> Unit
 ) {
     Column {
         ExtendedFloatingActionButton(
             onClick = onAddClick,
             icon = { Icon(Icons.Filled.Add, contentDescription = "Add Item") },
-            text = { Text("Add Reminder") }
-        )
-        ExtendedFloatingActionButton(
-            onClick = onNotifyClick,
-            icon = { Icon(Icons.Filled.Add, contentDescription = "Send Notification") },
-            text = { Text("Send Notification") }
+            text = { Text("Add Reminder") },
+            modifier = Modifier.padding(end = 16.dp, bottom = 64.dp).scale(1.2f)
         )
     }
 }
 
 @Composable
 fun ReminderList(
-    items: List<String>,
+    items: List<Pair<String, String>>,
     modifier: Modifier = Modifier
 ) {
-    LazyColumn(
-        modifier = modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        items(items.size) { i ->
-            ReminderListItem(
-                itemName = items[i],
-                itemNumber = i + 1,
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .fillMaxWidth()
-            )
+    if (items.size == 0) {
+        Text(
+            text = "No items added yet",
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = modifier
+                .padding(16.dp)
+                .fillMaxSize()
+                .fillMaxWidth()
+                .wrapContentHeight(Alignment.CenterVertically)
+                .wrapContentWidth(Alignment.CenterHorizontally)
+        )
+    } else {
+        LazyColumn(
+            modifier = modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            items(items.size) { i ->
+                ReminderListItem(
+                    itemName = items[i].first,
+                    itemNumber = i + 1,
+                    itemReminderTime = items[i].second,
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                        .fillMaxWidth()
+                )
+            }
         }
     }
 }
@@ -172,7 +186,7 @@ fun ReminderListItem(
     modifier: Modifier = Modifier,
     itemNumber: Int = 0,
     itemName: String = "Item name",
-    itemReminderTime: LocalTime = LocalTime.now(ZoneId.systemDefault())
+    itemReminderTime: String = Calendar.getInstance(TimeZone.getDefault()).toString(),
 ) {
     Column {
         ListItem(
@@ -180,7 +194,7 @@ fun ReminderListItem(
             supportingContent = {
                 Text(
                     "Reminder scheduled for ${
-                        itemReminderTime.format(DateTimeFormatter.ofPattern("hh:mm a"))
+                        itemReminderTime
                     }"
                 )
             },
@@ -192,29 +206,72 @@ fun ReminderListItem(
 
 @Composable
 fun AddItemDialog(
-    onDismiss: (String?) -> Unit
+    onDismiss: (String?, Calendar?) -> Unit,
+    modifier: Modifier = Modifier,
+    sharedText: String = "",
 ) {
-    val textFieldState = rememberTextFieldState() // Using Compose input states
-
+    val textFieldState = rememberTextFieldState(sharedText) // if no text is shared the input is still empty
+    var showTimePickerSate: Boolean by remember { mutableStateOf(false) }
+    var selectedTime: Calendar by remember {
+        mutableStateOf(
+            Calendar.getInstance(TimeZone.getDefault()).apply { add(Calendar.HOUR, 1) })
+    }
     BasicAlertDialog(
-        onDismissRequest = { onDismiss(null) }
-    ) {
+        onDismissRequest = { onDismiss(null, null) },
+
+        ) {
         Surface(
-            modifier = Modifier.wrapContentSize(),
+            modifier = modifier.wrapContentSize(),
             shape = MaterialTheme.shapes.large,
             tonalElevation = AlertDialogDefaults.TonalElevation
         ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                AddItemDialogTextField(
-                    state = textFieldState,
-                    modifier = Modifier.fillMaxWidth()
-                )
-                TextButton(
-                    enabled = textFieldState.text.isNotEmpty(),
-                    onClick = { onDismiss(textFieldState.text.toString()) },
-                    modifier = Modifier.align(Alignment.End)
-                ) {
-                    Text("Confirm")
+            Box {
+                Column(modifier = modifier.padding(16.dp)) {
+                    Text(
+                        text = "Add new reminder",
+                        style = MaterialTheme.typography.titleLarge,
+                        modifier = modifier
+                            .padding(top = 24.dp)
+                            .align(Alignment.CenterHorizontally)
+                    )
+                    Spacer(modifier = Modifier.height(24.dp))
+                    AddItemDialogTextField(
+                        state = textFieldState,
+                        modifier = modifier.fillMaxWidth()
+                    )
+                    OutlinedButton(
+                        onClick = { showTimePickerSate = true },
+                        modifier = modifier
+                            .align(Alignment.Start)
+                            .padding(top = 16.dp, bottom = 16.dp)
+                            .fillMaxWidth()
+                    ) {
+                        Text(
+                            "Select time (Default: ${
+                                SimpleDateFormat(
+                                    "HH:mm",
+                                    Locale.getDefault()
+                                ).format(selectedTime.time)
+                            })"
+                        )
+                    }
+                    Button(
+                        enabled = textFieldState.text.isNotEmpty(),
+                        onClick = { onDismiss(textFieldState.text.toString(), selectedTime) },
+                        modifier = modifier.align(Alignment.End)
+                    ) {
+                        Text("Confirm")
+                    }
+                }
+                if (showTimePickerSate) {
+                    TimepickerComposables.TimePickerDialog(
+                        onCancel = { showTimePickerSate = false },
+                        onConfirm = { time ->
+                            selectedTime = time
+                            showTimePickerSate = false
+                        },
+                        modifier = modifier
+                    )
                 }
             }
         }
@@ -226,44 +283,49 @@ fun AddItemDialogTextField(
     modifier: Modifier = Modifier,
     state: TextFieldState = rememberTextFieldState()
 ) {
-    Column {
-        TextField(
-            state = state,
-            isError = state.text.isEmpty(),
-            lineLimits = TextFieldLineLimits.SingleLine,
-            label = {
-                Text("Reminder name")
-            },
-            placeholder = { Text("Enter reminder name") },
-            modifier = modifier.fillMaxWidth()
-        )
-        if (state.text.isEmpty()) {
-            Text(
-                text = "Reminder name required",
-                color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.labelSmall,
-                modifier = Modifier.padding(top = 8.dp, start = 16.dp)
-            )
-        }
+    val focusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
     }
+
+    OutlinedTextField(
+        state = state,
+        isError = state.text.isEmpty(),
+        lineLimits = TextFieldLineLimits.SingleLine,
+        label = {
+            Text("Reminder name")
+        },
+        placeholder = { Text("Enter reminder name") },
+        modifier = modifier.fillMaxWidth().focusRequester(focusRequester),
+        trailingIcon = {
+            if (state.text.isEmpty()) {
+                Icon(Icons.Filled.ErrorOutline, contentDescription = "Reminder name required")
+            }
+        },
+        supportingText = {
+            if (state.text.isEmpty()) {
+                Text(
+                    text = "required",
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.labelSmall,
+                )
+            } else {
+                Text(
+                    text = "Required",
+                    color = MaterialTheme.colorScheme.secondary,
+                    style = MaterialTheme.typography.labelSmall,
+                )
+            }
+        },
+    )
 }
 
 fun requestNotificationPermission(context: ComponentActivity) {
     ActivityCompat.requestPermissions(
         context,
-        arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),
+        arrayOf(Manifest.permission.POST_NOTIFICATIONS),
         1001
     )
 }
 
-@Preview(showBackground = true)
-@Composable
-fun PreviewMainActivityScreen() {
-    LinkLaterTheme {
-        MainActivityScreen(
-            listDataStore = ListDataStore(LocalContext.current),
-            onAddItem = {},
-            onScheduleNotification = {}
-        )
-    }
-}
