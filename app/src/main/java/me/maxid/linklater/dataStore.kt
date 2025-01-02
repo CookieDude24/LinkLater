@@ -50,5 +50,6 @@ class ListDataStore(private val context: Context) {
 
         // Add the new item as a pair and save the updated list
         saveList(currentList + Pair(item, time))
+
     }
 }

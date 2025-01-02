@@ -8,6 +8,7 @@ import androidx.core.app.NotificationCompat
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.workDataOf
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 object NotificationUtils {
@@ -21,20 +22,27 @@ object NotificationUtils {
      * @param message The body content of the notification.
      */
     fun scheduleNotification(context: Context, delayInSeconds: Long, title: String, message: String) {
-        // Data to be sent to the Worker
         val workData = workDataOf(
             "title" to title,
             "message" to message
         )
 
-        // Set up work request with delay
         val workRequest = OneTimeWorkRequestBuilder<NotificationWorker>()
             .setInitialDelay(delayInSeconds, TimeUnit.SECONDS)
             .setInputData(workData)
             .build()
 
-        // Enqueue the work
         WorkManager.getInstance(context).enqueue(workRequest)
+    }
+    /**
+     * Schedules a reminder using the scheduleNotification function.
+     *
+     * @param context The application context.
+     * @param time The point in time the reminder should be scheduled for.
+     * @param message The body content of the notification.
+     */
+    fun scheduleReminder(context: Context, time: Calendar, message: String) {
+        scheduleNotification(context,time.timeInMillis / 1000 - System.currentTimeMillis() / 1000,"Reminder",message)
     }
 
     /**
@@ -63,7 +71,7 @@ object NotificationUtils {
 
         // Build and show the notification
         val notification = NotificationCompat.Builder(context, channelId)
-            .setSmallIcon(android.R.drawable.ic_dialog_info)
+            .setSmallIcon(R.mipmap.ic_launcher)
             .setContentTitle(title)
             .setContentText(message)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
