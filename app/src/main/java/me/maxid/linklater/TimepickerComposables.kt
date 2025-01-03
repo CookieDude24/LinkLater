@@ -1,6 +1,7 @@
 package me.maxid.linklater
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Keyboard
 import androidx.compose.material.icons.filled.Schedule
@@ -8,6 +9,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import java.util.*
@@ -18,10 +20,9 @@ object TimepickerComposables {
     fun TimePickerDialog(
         onCancel: () -> Unit,
         onConfirm: (Calendar) -> Unit,
-        modifier: Modifier = Modifier
+        modifier: Modifier = Modifier,
+        time: Calendar = Calendar.getInstance()
     ) {
-
-        val time = Calendar.getInstance()
         time.timeInMillis = System.currentTimeMillis()
 
         var mode: DisplayMode by remember { mutableStateOf(DisplayMode.Picker) }
@@ -34,6 +35,11 @@ object TimepickerComposables {
             val cal = Calendar.getInstance()
             cal.set(Calendar.HOUR_OF_DAY, timeState.hour)
             cal.set(Calendar.MINUTE, timeState.minute)
+            if (timeState.hour == time[Calendar.HOUR_OF_DAY] && timeState.minute <= time[Calendar.MINUTE] ||
+                timeState.hour < time[Calendar.HOUR_OF_DAY]
+            ) {
+                cal.add(Calendar.DAY_OF_WEEK, 1)
+            }
             cal.isLenient = false
 
             onConfirm(cal)
@@ -44,7 +50,40 @@ object TimepickerComposables {
         PickerDialog(
             modifier = modifier,
             onDismissRequest = onCancel,
-            title = { Text("Select hour") },
+            title = {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    Text(
+                        "Select time",
+                        modifier = Modifier.align(Alignment.CenterHorizontally),
+                        style = MaterialTheme.typography.titleMedium
+                    )
+
+                    if (timeState.hour == time[Calendar.HOUR_OF_DAY] && timeState.minute <= time[Calendar.MINUTE] ||
+                        timeState.hour < time[Calendar.HOUR_OF_DAY]
+                    ) {
+                        Surface(
+                            tonalElevation = 0.dp,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 12.dp),
+                            shadowElevation = 5.dp,
+                            shape = RoundedCornerShape(10.dp),
+                            color = MaterialTheme.colorScheme.primaryContainer
+                        ) {
+                            Text(
+                                "The reminder will go off tomorrow!",
+                                style = MaterialTheme.typography.labelLarge,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.padding(8.dp)
+                            )
+                        }
+                    }
+                }
+
+            },
             buttons = {
                 DisplayModeToggleButton(
                     displayMode = mode,
@@ -64,6 +103,7 @@ object TimepickerComposables {
                 DisplayMode.Picker -> TimePicker(modifier = contentModifier, state = timeState)
                 DisplayMode.Input -> TimeInput(modifier = contentModifier, state = timeState)
             }
+
         }
     }
 

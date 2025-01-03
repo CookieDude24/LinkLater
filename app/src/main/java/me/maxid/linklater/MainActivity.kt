@@ -115,7 +115,8 @@ fun MainActivityScreen(
 @Composable
 fun CommonTopBar(title: String) {
     CenterAlignedTopAppBar(
-        title = { Text(text = title, maxLines = 1, overflow = TextOverflow.Ellipsis) })
+        title = { Text(text = title, maxLines = 1, overflow = TextOverflow.Ellipsis) },
+    )
 }
 
 @Composable
@@ -197,9 +198,9 @@ fun requestNotificationPermission(context: ComponentActivity) {
 
 fun timeFormatter(time: Calendar, withWeekday: Boolean = false): String {
     if (withWeekday) {
-        val dateTimeFormatter = DateFormat.getDateTimeInstance(DateFormat.SHORT,DateFormat.SHORT, Locale.getDefault())
+        val dateTimeFormatter = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, Locale.getDefault())
         return dateTimeFormatter.format(time.time)
-    }else{
+    } else {
         val timeFormatter = DateFormat.getTimeInstance(DateFormat.SHORT, Locale.getDefault())
         return timeFormatter.format(time.time)
     }

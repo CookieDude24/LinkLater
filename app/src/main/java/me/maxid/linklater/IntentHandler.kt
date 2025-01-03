@@ -15,12 +15,16 @@ class IntentHandlerActivity : ComponentActivity() {
             LinkLaterTheme {
                 AddItemDialog(
                     onDismiss = { notificationText, time ->
-                    if (!notificationText.isNullOrEmpty()) {
-                        if (time != null) {
-                            NotificationUtils.scheduleReminder(this,time,notificationText)
-                            Toast.makeText(this, "Text: $notificationText", Toast.LENGTH_SHORT).show()
+                    if (!notificationText.isNullOrEmpty() && time != null) {
+                        NotificationUtils.scheduleReminder(
+                            this,
+                            time,
+                            notificationText
+                        )
+
+                        Toast.makeText(this, "Text: $notificationText", Toast.LENGTH_SHORT).show()
                         }
-                    }
+
                     finish()
                 },
                     sharedText = intent.getStringExtra(Intent.EXTRA_TEXT) ?: ""

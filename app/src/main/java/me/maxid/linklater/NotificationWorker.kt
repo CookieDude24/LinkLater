@@ -2,10 +2,8 @@
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
-import android.app.PendingIntent.FLAG_IMMUTABLE
 import android.content.Context
 import android.content.Intent
-import android.content.Intent.*
 import android.net.Uri
 import androidx.core.app.NotificationCompat
 import androidx.work.Worker
@@ -33,37 +31,39 @@ class NotificationWorker(appContext: Context, workerParams: WorkerParameters) :
         val notificationManager =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        // Create a notification channel for Android 8.0 and above
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                channelId,
-                "Reminders",
-                NotificationManager.IMPORTANCE_HIGH
-            ).apply {
-                description = "Channel for reminders"
-            }
-            notificationManager.createNotificationChannel(channel)
+        val channel = NotificationChannel(
+            channelId,
+            "Reminders",
+            NotificationManager.IMPORTANCE_HIGH
+        ).apply {
+            description = "Channel for reminders"
+        }
+        notificationManager.createNotificationChannel(channel)
+
+        // Create an Intent to open the link in a browser or another app
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(message)).apply {
+            addCategory(Intent.CATEGORY_BROWSABLE)
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
         }
 
-
-        // Build the notification, Intents are basically the onClick of the notification
-        val intent = Intent(ACTION_VIEW, Uri.parse(message)).apply {
-            addCategory(CATEGORY_BROWSABLE)
-            flags = FLAG_ACTIVITY_NEW_TASK
-        }
-        val pendingIntent = PendingIntent.getActivity(context,1,intent,FLAG_IMMUTABLE)
-        context.startActivity(intent)
+        // Wrap the intent in a PendingIntent
+        val pendingIntent = PendingIntent.getActivity(
+            context,
+            1,
+            intent,
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
 
         val notification = NotificationCompat.Builder(context, channelId)
-            .setSmallIcon(R.drawable.notifications_notification)
+            .setSmallIcon(R.mipmap.link_monochrome) // Replace with your drawable
             .setContentTitle(title)
             .setContentText(message)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setContentIntent(pendingIntent) // may as well be referred to as "onClick"
+            .setContentIntent(pendingIntent) // Set the PendingIntent here
             .setAutoCancel(true)
+            .setCategory(NotificationCompat.CATEGORY_REMINDER)
             .build()
 
-        // Show the notification
         notificationManager.notify(1, notification)
     }
 

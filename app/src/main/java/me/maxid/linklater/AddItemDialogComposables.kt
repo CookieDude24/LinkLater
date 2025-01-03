@@ -76,7 +76,8 @@ object AddItemDialogComposables {
                                 selectedTime = time
                                 showTimePickerSate = false
                             },
-                            modifier = modifier
+                            modifier = modifier,
+                            time = selectedTime,
                         )
                     }
                 }
