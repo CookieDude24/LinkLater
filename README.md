@@ -1,6 +1,8 @@
 # LinkLater
+<p align="center">
+  <img alt="Two &quot;L&quot; Letters right next to each other" height="540" src="app/src/main/res/mipmap/link.png" title="LinkLater Logo" width="540"/>
+</p>
 
-<img alt="Two &quot;L&quot; Letters right next to each other" height="10vh" src="app/src/main/res/mipmap/link.png" title="LinkLater Logo" width="10vh"/>
 
 ## Features
 
