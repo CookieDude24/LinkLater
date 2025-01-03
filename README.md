@@ -3,7 +3,6 @@
   <img alt="Two &quot;L&quot; Letters right next to each other" height="540" src="app/src/main/res/mipmap/link.png" title="LinkLater Logo" width="540"/>
 </p>
 
-
 ## Features
 
 - Set reminders (only text)
@@ -20,11 +19,30 @@ Share Menu and the app reminds you of the poster at a later point in time.
 
 ## Screenshots
 
-![Screenshot_20250103_211007.png](Screenshots/Screenshot_20250103_211007.png)
+<table>
+  <tr>
+    <td>
+    <img alt="Screenshot_20250103_211007.png" src="Screenshots/Screenshot_20250103_211007.png"/>
+    </td>
+    <td>
+    <img alt="Screenshot_20250103_230344.png" src="Screenshots/Screenshot_20250103_230344.png"/>
+    </td>
+  </tr>
+  <tr>
+    <td>
+    <img alt="Screenshot_20250103_211019.png" src="Screenshots/Screenshot_20250103_211019.png"/>
+    </td>
+    <td>
+    <img alt="Screenshot_20250103_211030.png" src="Screenshots/Screenshot_20250103_211030.png"/>
+    </td>
+  </tr>
+  <tr>
+    <td>
+    <img alt="Screenshot_20250103_224613.png" src="Screenshots/Screenshot_20250103_224613.png"/>
+    </td>
+    <td>
+    <img alt="Screenshot_20250103_224538.png" src="Screenshots/Screenshot_20250103_224538.png"/>
+    </td>
+  </tr>
+</table>
 
-![Screenshot_20250103_211019.png](Screenshots/Screenshot_20250103_211019.png)
-![Screenshot_20250103_211030.png](Screenshots/Screenshot_20250103_211030.png)
-
-![Screenshot_20250103_224613.png](Screenshots/Screenshot_20250103_224613.png)
-
-![Screenshot_20250103_224538.png](Screenshots/Screenshot_20250103_224538.png)
