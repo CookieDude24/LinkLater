@@ -11,6 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import java.util.*
 
@@ -40,7 +41,7 @@ object AddItemDialogComposables {
                 Box {
                     Column(modifier = modifier.padding(16.dp)) {
                         Text(
-                            text = "Add new reminder",
+                            text = stringResource(R.string.add_item_dialog_title),
                             style = MaterialTheme.typography.titleLarge,
                             modifier = modifier
                                 .padding(top = 24.dp)
@@ -58,7 +59,7 @@ object AddItemDialogComposables {
                                 .fillMaxWidth()
                         ) {
                             Text(
-                                "Select time (Default: ${timeFormatter(selectedTime)})"
+                                stringResource(R.string.add_item_dialog_select_time_button, timeFormatter(selectedTime))
                             )
                         }
                         Button(
@@ -66,7 +67,7 @@ object AddItemDialogComposables {
                             onClick = { onDismiss(textFieldState.text.toString(), selectedTime) },
                             modifier = modifier.align(Alignment.End)
                         ) {
-                            Text("Confirm")
+                            Text(stringResource(R.string.confirm_textbutton))
                         }
                     }
                     if (showTimePickerSate) {
@@ -103,27 +104,27 @@ object AddItemDialogComposables {
             isError = state.text.isEmpty(),
             lineLimits = TextFieldLineLimits.SingleLine,
             label = {
-                Text("Reminder name")
+                Text(stringResource(R.string.add_item_dialog_textfield_label_reminder_name))
             },
-            placeholder = { Text("Enter reminder name") },
+            placeholder = { Text(stringResource(R.string.add_item_dialog_textfield_reminder_name_placeholder)) },
             modifier = modifier
                 .fillMaxWidth()
                 .focusRequester(focusRequester),
             trailingIcon = {
                 if (state.text.isEmpty()) {
-                    Icon(Icons.Filled.ErrorOutline, contentDescription = "Reminder name required")
+                    Icon(Icons.Filled.ErrorOutline, contentDescription = stringResource(R.string.add_item_dialog_reminder_name_required_error))
                 }
             },
             supportingText = {
                 if (state.text.isEmpty()) {
                     Text(
-                        text = "required",
+                        text = stringResource(R.string.required),
                         color = MaterialTheme.colorScheme.error,
                         style = MaterialTheme.typography.labelSmall,
                     )
                 } else {
                     Text(
-                        text = "Required",
+                        text = stringResource(R.string.required),
                         color = MaterialTheme.colorScheme.secondary,
                         style = MaterialTheme.typography.labelSmall,
                     )

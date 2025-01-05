@@ -9,6 +9,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
@@ -56,7 +57,7 @@ object TimepickerComposables {
                         .fillMaxWidth()
                 ) {
                     Text(
-                        "Select time",
+                        stringResource(R.string.timepicker_dialog_title),
                         modifier = Modifier.align(Alignment.CenterHorizontally),
                         style = MaterialTheme.typography.titleMedium
                     )
@@ -74,7 +75,7 @@ object TimepickerComposables {
                             color = MaterialTheme.colorScheme.primaryContainer
                         ) {
                             Text(
-                                "The reminder will go off tomorrow!",
+                                stringResource(R.string.timepicker_dialog_reminder_going_off_tomorrow),
                                 style = MaterialTheme.typography.labelLarge,
                                 textAlign = TextAlign.Center,
                                 modifier = Modifier.padding(8.dp)
@@ -91,10 +92,10 @@ object TimepickerComposables {
                 )
                 Spacer(Modifier.weight(1f))
                 TextButton(onClick = onCancel) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel_textbutton))
                 }
                 Button(onClick = ::onConfirmClicked) {
-                    Text("Confirm")
+                    Text(stringResource(R.string.confirm_textbutton))
                 }
             },
         ) {
@@ -119,14 +120,14 @@ object TimepickerComposables {
                 modifier = modifier,
                 onClick = { onDisplayModeChange(DisplayMode.Input) },
             ) {
-                Icon(Icons.Default.Keyboard, contentDescription = "Add Item")
+                Icon(Icons.Default.Keyboard, contentDescription = stringResource(R.string.timepicker_dialog_displaymode_toggle_content_description))
             }
 
             DisplayMode.Input -> IconButton(
                 modifier = modifier,
                 onClick = { onDisplayModeChange(DisplayMode.Picker) },
             ) {
-                Icon(Icons.Default.Schedule, contentDescription = "Add Item")
+                Icon(Icons.Default.Schedule, contentDescription = stringResource(R.string.timepicker_dialog_displaymode_toggle_content_description))
             }
         }
     }

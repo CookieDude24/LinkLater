@@ -1,6 +1,27 @@
 <resources>
-    <string name="app_name">LinkLater</string>
-    <string name="topAppBar">LinkLater</string>
+    <string name="app_name" translatable="false">LinkLater</string>
+    <string name="topAppBar" translatable="false">LinkLater</string>
     <string name="add_item_fab">Add Item</string>
     <string name="add_item_icon_description">Add</string>
+    <string name="reminder_scheduled_for">Reminder scheduled for %1$s</string>
+    <string name="reminder_number">Reminder #%1$s</string>
+    <string name="no_items_added_yet">No items added yet</string>
+    <string name="add_reminder_fab">Add Reminder</string>
+    <string name="notification_title">Reminder</string>
+    <string name="default_list_item_name">Item name</string>
+    <string name="successful_reminder_creation">Successfully created a Reminder!</string>
+    <string name="reminder_notification_channel_name">Reminders</string>
+    <string name="reminders_notification_channel_description">Channel for reminders</string>
+    <string name="timepicker_dialog_title">Select time</string>
+    <string name="timepicker_dialog_reminder_going_off_tomorrow">The reminder will go off tomorrow!</string>
+    <string name="cancel_textbutton">Cancel</string>
+    <string name="confirm_textbutton">Confirm</string>
+    <string name="timepicker_dialog_displaymode_toggle_content_description">Add Item</string>
+    <string name="add_item_dialog_title">Add new reminder</string>
+    <string name="confirm_textbutton1">Confirm</string>
+    <string name="add_item_dialog_select_time_button">Select time (Default: %1$s)</string>
+    <string name="add_item_dialog_textfield_label_reminder_name">Reminder name</string>
+    <string name="add_item_dialog_textfield_reminder_name_placeholder">Enter reminder name</string>
+    <string name="add_item_dialog_reminder_name_required_error">Reminder name required</string>
+    <string name="required">Required</string>
 </resources>

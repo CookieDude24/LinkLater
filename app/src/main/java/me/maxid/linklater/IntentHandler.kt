@@ -22,7 +22,7 @@ class IntentHandlerActivity : ComponentActivity() {
                             notificationText
                         )
 
-                        Toast.makeText(this, "Successfully created a Reminder!", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, getString(R.string.successful_reminder_creation), Toast.LENGTH_SHORT).show()
                         }
 
                     finish()

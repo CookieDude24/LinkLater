@@ -55,7 +55,7 @@ class MainActivity : ComponentActivity() {
                         NotificationUtils.scheduleNotification(
                             context = this@MainActivity,
                             delayInSeconds = scheduledTime.timeInMillis / 1000 - System.currentTimeMillis() / 1000,
-                            title = "Reminder",
+                            title = getString(R.string.notification_title),
                             message = newItem,
                         )
 
@@ -126,8 +126,8 @@ fun CommonFloatingButtons(
     Column {
         ExtendedFloatingActionButton(
             onClick = onAddClick,
-            icon = { Icon(Icons.Filled.Add, contentDescription = "Add Item") },
-            text = { Text("Add Reminder") },
+            icon = { Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.add_reminder_fab)) },
+            text = { Text(stringResource(R.string.add_reminder_fab)) },
             modifier = Modifier
                 .padding(end = 16.dp, bottom = 64.dp)
                 .scale(1.2f)
@@ -141,7 +141,7 @@ fun ReminderList(
 ) {
     if (items.size == 0) {
         Text(
-            text = "No items added yet",
+            text = stringResource(R.string.no_items_added_yet),
             style = MaterialTheme.typography.bodyLarge,
             modifier = modifier
                 .padding(16.dp)
@@ -172,7 +172,7 @@ fun ReminderList(
 fun ReminderListItem(
     modifier: Modifier = Modifier,
     itemNumber: Int = 0,
-    itemName: String = "Item name",
+    itemName: String = stringResource(R.string.default_list_item_name),
     itemReminderTime: String = Calendar.getInstance(TimeZone.getDefault()).toString(),
 ) {
     Column {
@@ -180,10 +180,10 @@ fun ReminderListItem(
             headlineContent = { Text(itemName) },
             supportingContent = {
                 Text(
-                    "Reminder scheduled for $itemReminderTime"
+                    stringResource(R.string.reminder_scheduled_for, itemReminderTime)
                 )
             },
-            trailingContent = { Text("Reminder #$itemNumber") },
+            trailingContent = { Text(stringResource(R.string.reminder_number, itemNumber)) },
         )
         HorizontalDivider()
     }

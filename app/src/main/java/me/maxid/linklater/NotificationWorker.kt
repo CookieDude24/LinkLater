@@ -33,10 +33,10 @@ class NotificationWorker(appContext: Context, workerParams: WorkerParameters) :
 
         val channel = NotificationChannel(
             channelId,
-            "Reminders",
+            context.getString(R.string.reminder_notification_channel_name),
             NotificationManager.IMPORTANCE_HIGH
         ).apply {
-            description = "Channel for reminders"
+            description = context.getString(R.string.reminders_notification_channel_description)
         }
         notificationManager.createNotificationChannel(channel)
 
