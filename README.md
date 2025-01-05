@@ -3,6 +3,12 @@
   <img alt="Two &quot;L&quot; Letters right next to each other" height="540" src="app/src/main/res/mipmap/link.png" title="LinkLater Logo" width="540"/>
 </p>
 
+## Download
+
+Install this app from one of the following sources:
+
+- [Github](https://github.com/CookieDude24/LinkLater/releases/download/1.0/LinkLater-1.0.apk)
+
 ## Features
 
 - Set reminders (only text)
